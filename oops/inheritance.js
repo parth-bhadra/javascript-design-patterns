@@ -24,10 +24,14 @@ class Parent {
 }
 
 Parent.prototype.getName = () => {
+    // arrow function's this is not bound to anything
+    // to use this meaningfully convert this to normal function
+    console.log(this);
     return this.nameP;
 }
 
 let p1 = new Parent("Father1");
+// Parent.prototype.getName.bind(p1); // this does not change the value of this, so if you want to use the value of this meaningfully, use normal function
 // console.log(p1);
 
 let p2 = new Parent("Father1");
