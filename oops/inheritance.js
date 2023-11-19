@@ -10,21 +10,32 @@ class Parent {
         this.nameP = nameP;
     }
 
-    getName = () => {
-        return this.nameP;
-    }
+    // getName = () => {
+    //     return this.nameP;
+    // }
 
-    getName = (n) => {
-        return n;
+    // getName = (n) => { // function overloading
+    //     return n;
+    // }
+
+    getSomething = () => { // when you write functions like these, they are treated as attributes and a new copy is created each time an object is created
+        console.log("testing");
     }
 }
 
-// let p1 = new Parent("Father1", 30);
+Parent.prototype.getName = () => {
+    return this.nameP;
+}
+
+let p1 = new Parent("Father1");
 // console.log(p1);
 
-let p2 = new Parent("Father2");
-console.log(p2);
-p2.getName("hello");
+let p2 = new Parent("Father1");
+// console.log(p2);
+// p2.getName("hello");
+
+console.log(p1.nameP == p2.nameP);
+console.log(p1.getName == p2.getName); // this happens because javascript creates new copies of functions for each object
 
 class Child extends Parent { // inheritance
     constructor(name) {
@@ -34,7 +45,7 @@ class Child extends Parent { // inheritance
 }
 
 let c = new Child("Son");
-console.log(c);
+// console.log(c);
 
 // this was inheritance using class
 
