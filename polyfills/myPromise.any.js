@@ -1,42 +1,41 @@
 Promise.myAny = async function (promises) {
-  return new Promise(async (resolve, reject) => {
-    // promises.forEach(async promise => {
-    //   // everything inside of a for each is async task and is non blocking
-    //   resolve(await Promise.resolve(promise));
-    // });
-
-    // implementation with for loop
-    // async at the top is only for the for loop below
-    // for (let i = 0; i < promises.length; i++) {
-    //   // everything inside of a for loop is a sync task and is blocking
-    //   resolve(await Promise.resolve(promises[i]));
-    // }
-
-    // implementation with for loop
+  return new Promise((resolve, reject) => {
+    let cnt = 0;
+    let errors = [];
     for (let i = 0; i < promises.length; i++) {
-      // everything inside of a for loop is a sync task and is blocking
-      // modifying the for loop to make it behave asynchronously
       setTimeout(async () => {
-        resolve(await Promise.resolve(promises[i]));
+        try {
+          resolve(await Promise.resolve(promises[i]));
+        } catch (error) {
+          cnt++;
+          errors.push(error);
+
+          if (cnt == promises.length) {
+            // console.log("inside catch block, rejecting now...");
+            reject(new AggregateError(errors, "All promises were rejected"));
+          }
+        }
       }, 0);
     }
   });
 };
 
 let a = new Promise((resolve, reject) => {
-  setTimeout(() => {
-    console.log("inside api 1");
-    resolve("api 1 success");
-    //   reject("api 1 fail");
-  }, 3000);
+  // setTimeout(resolve, 1000, "api 1 success");
+  setTimeout(reject, 1000, "api 1 fail");
 });
-
 let b = new Promise((resolve, reject) => {
-  setTimeout(() => {
-    console.log("inside api 2");
-    resolve("api 2 success");
-    // reject("api 2 fail");
-  }, 5000);
+  // setTimeout(resolve, 1000, "api 2 success");
+  setTimeout(reject, 1000, "api 1 fail");
 });
 
-console.log(await Promise.myAny([b, a, 10]));
+async function handler() {
+  try {
+    console.log(await Promise.myAny([b, a]));
+    // console.log(await Promise.any([b, a]));
+  } catch (error) {
+    throw error;
+  }
+}
+
+handler();
