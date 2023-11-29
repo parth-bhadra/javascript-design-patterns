@@ -3,30 +3,29 @@ Promise.myAny = async function (promises) {
     let cnt = 0;
     let errors = [];
     for (let i = 0; i < promises.length; i++) {
-      setTimeout(async () => {
-        try {
-          resolve(await Promise.resolve(promises[i]));
-        } catch (error) {
+      // a simpler implementation using then and catch block
+      // it saves you the implementation of ty catch
+      Promise.resolve(promises[i])
+        .then((data) => {
+          resolve(data);
+        })
+        .catch((e) => {
           cnt++;
-          errors.push(error);
-
-          if (cnt == promises.length) {
-            // console.log("inside catch block, rejecting now...");
+          errors.push(e);
+          if (cnt === promises.length)
             reject(new AggregateError(errors, "All promises were rejected"));
-          }
-        }
-      }, 0);
+        });
     }
   });
 };
 
 let a = new Promise((resolve, reject) => {
-  // setTimeout(resolve, 1000, "api 1 success");
-  setTimeout(reject, 1000, "api 1 fail");
+  setTimeout(resolve, 1000, "api 1 success");
+  // setTimeout(reject, 1000, "api 1 fail");
 });
 let b = new Promise((resolve, reject) => {
-  // setTimeout(resolve, 1000, "api 2 success");
-  setTimeout(reject, 1000, "api 1 fail");
+  setTimeout(resolve, 900, "api 2 success");
+  // setTimeout(reject, 1000, "api 1 fail");
 });
 
 async function handler() {
@@ -36,6 +35,8 @@ async function handler() {
   } catch (error) {
     throw error;
   }
+
+  // console.log(await Promise.myAny([b, a, 10]));
 }
 
 handler();
